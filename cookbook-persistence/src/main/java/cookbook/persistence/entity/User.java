@@ -1,5 +1,7 @@
 package cookbook.persistence.entity;
 
+import cookbook.domain.UserType;
+
 import javax.persistence.*;
 
 //@Entity
@@ -11,6 +13,8 @@ public class User {
     private Long id;
     private String password;
     private String username;
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
 
     public User() {
     }
@@ -43,5 +47,13 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 }

@@ -1,10 +1,9 @@
 package cookbook.service.transformer;
 
+import cookbook.domain.Unit;
+import cookbook.persistence.entity.Ingredient;
 import cookbook.persistence.entity.Recipe;
-import cookbook.service.dto.CommentDTO;
-import cookbook.service.dto.CookDTO;
-import cookbook.service.dto.IngredientDTO;
-import cookbook.service.dto.RecipeDTO;
+import cookbook.service.dto.*;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -53,4 +52,36 @@ public class RecipeTransformer {
         recipeEntity.setCategories(recipe.getCategories());
         return recipeEntity;
     }
+
+    public RecipeDTO processNewRecipeFormToDTO(NewRecipeForm newRecipeForm){
+        RecipeDTO recipeDTO = new RecipeDTO();
+        recipeDTO.setName(newRecipeForm.getName());
+        recipeDTO.setServings(newRecipeForm.getServings());
+        recipeDTO.setPreparation(newRecipeForm.getPreparation());
+        recipeDTO.setCategories(newRecipeForm.getCategories());
+
+        List<IngredientDTO> ingredientDTOList = new ArrayList<>();
+
+        String[] ingredientsArray = newRecipeForm.getIngredients().split("\n");
+        for(String ingredient: ingredientsArray){
+            String[] ingredientArray = ingredient.split(" ");
+            IngredientDTO ingredientObj = new IngredientDTO();
+            ingredientObj.setAmount(Double.parseDouble(ingredientArray[0]));
+            ingredientObj.setUnit(Unit.valueOf(ingredientArray[1].toUpperCase()));
+            ingredientObj.setName(ingredientArray[2]);
+            ingredientDTOList.add(ingredientObj);
+        }
+        recipeDTO.setIngredients(ingredientDTOList);
+        return recipeDTO;
+    }
+
+
+/*    public static Recipe convertToEntity(RecipeDTO recipe){
+        Recipe recipeEntity = new Recipe();
+        recipeEntity.setId(recipe.getId());
+        recipeEntity.setName(recipe.getName());
+        recipeEntity.setServings(recipe.getServings());
+        recipeEntity.setPreparation(recipe.getPreparation());
+        return recipeEntity;
+    }*/
 }

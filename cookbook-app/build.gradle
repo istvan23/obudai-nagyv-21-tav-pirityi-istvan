@@ -1,6 +1,5 @@
 def entryPoint = 'cookbook.SpringBootApp'
 apply plugin: 'application'
-
 application {
     mainClassName = entryPoint
 }

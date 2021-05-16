@@ -1,5 +1,7 @@
 package cookbook.persistence.entity;
 
+import cookbook.domain.UserType;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,6 +21,7 @@ public class Cook extends User {
         super();
         this.comments = new ArrayList<>();
         this.ownRecipes = new ArrayList<>();
+        this.setUserType(UserType.USER);
     }
 
     public Cook(Long id, String username, String password, List<Comment> comments, List<Recipe> ownRecipes) {

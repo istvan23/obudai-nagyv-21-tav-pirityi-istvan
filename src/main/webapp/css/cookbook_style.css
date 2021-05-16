@@ -1,0 +1,49 @@
+.card {
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 5%;
+    border: 2px solid lightblue;
+}
+
+.card-header {
+    color: white;
+    background-color: skyblue;
+}
+
+.navbar .btn {
+    margin-left: 1400px;
+}
+
+.comments {
+    margin-left: 5%;
+    margin-right: 5%;
+    margin-top: 5%;
+    border: 2px solid lightblue;
+}
+
+.commentform {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    white-space:normal;
+    margin-top: 10px;
+}
+
+.search {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    white-space:normal;
+    margin-top: 10px;
+}
+
+.message {
+    color: blue;
+}
+
+.card.login {
+    margin-left: 35%;
+    margin-right: 35%;
+    margin-top: 5%;
+    border: 2px solid lightblue;
+}

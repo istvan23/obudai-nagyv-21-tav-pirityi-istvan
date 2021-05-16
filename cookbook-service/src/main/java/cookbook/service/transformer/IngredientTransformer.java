@@ -14,7 +14,6 @@ public class IngredientTransformer {
         ingredientDTO.setUnit(ingredient.getUnit());
         return ingredientDTO;
     }
-
     public Ingredient convertToEntity(IngredientDTO ingredient){
         Ingredient ingredientEntity = new Ingredient();
         ingredientEntity.setName(ingredient.getName());
