@@ -1,0 +1,10 @@
+dependencies {
+    implementation project(':cookbook-domain')
+}
+
+jar {
+    enabled = true
+}
+bootJar {
+    enabled = false
+}

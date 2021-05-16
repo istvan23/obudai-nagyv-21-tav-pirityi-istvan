@@ -1,0 +1,20 @@
+def entryPoint = 'cookbook.SpringBootApp'
+apply plugin: 'application'
+
+application {
+    mainClassName = entryPoint
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class' : entryPoint
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it)}
+    }
+}
+
+dependencies {
+    implementation project(':cookbook-service')
+    implementation project(':cookbook-domain')
+}

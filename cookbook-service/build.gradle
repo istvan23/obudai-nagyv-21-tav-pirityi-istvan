@@ -1,0 +1,11 @@
+dependencies {
+    implementation project(':cookbook-persistence')
+    implementation project(':cookbook-domain')
+}
+
+jar {
+    enabled = true
+}
+bootJar {
+    enabled = false
+}
