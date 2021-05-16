@@ -1,8 +1,8 @@
 package cookbook.service;
 
 import cookbook.domain.Category;
-import cookbook.domain.Cook;
-import cookbook.domain.Recipe;
+import cookbook.service.dto.CookDTO;
+import cookbook.service.dto.RecipeDTO;
 
 import java.util.List;
 import java.util.Set;
@@ -10,12 +10,12 @@ import java.util.Set;
 public interface CookbookService {
     void login(String username);
     void logout();
-    void addRecipe(Recipe recipe);
-    void saveComment(Recipe recipe, String comment);
+    void addRecipe(RecipeDTO recipe);
+    void saveComment(RecipeDTO recipe, String comment);
     boolean isLoggedIn();
-    List<Recipe> getRecipes();
+    List<RecipeDTO> getRecipes();
     Set<Category> getCategories();
-    Cook getCurrentUser();
+    CookDTO getCurrentUser();
     boolean authenticate(String username, String password);
     void deleteRecipe(String recipe);
 }

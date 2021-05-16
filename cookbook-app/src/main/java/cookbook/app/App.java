@@ -1,20 +1,18 @@
 package cookbook.app;
 
 import cookbook.domain.Category;
-import cookbook.domain.Comment;
-import cookbook.domain.Recipe;
 import cookbook.service.CookbookService;
+import cookbook.service.dto.RecipeDTO;
 import cookbook.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import javax.transaction.Transactional;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Component
+@Transactional
 public class App {
     private View view;
     private CookbookService cookbookService;
@@ -52,7 +50,7 @@ public class App {
                     this.printRecipe(Integer.parseInt(recipeIndex));
                     this.view.printGuestRecipeOptions();
                     String index = this.view.getInput();
-                    Recipe recipe = this.cookbookService.getRecipes().get(Integer.parseInt(recipeIndex));
+                    RecipeDTO recipe = this.cookbookService.getRecipes().get(Integer.parseInt(recipeIndex));
                     this.processRecipeMenuInput(recipe, index);
                 }
                 catch (NumberFormatException numberFormatException){
@@ -84,7 +82,7 @@ public class App {
                     this.printRecipe(Integer.parseInt(recipeIndex));
                     this.view.printUserRecipeOptions();
                     String index = this.view.getInput();
-                    Recipe recipe = this.cookbookService.getRecipes().get(Integer.parseInt(recipeIndex));
+                    RecipeDTO recipe = this.cookbookService.getRecipes().get(Integer.parseInt(recipeIndex));
                     this.processRecipeMenuInput(recipe, index);
                 }
                 catch (NumberFormatException numberFormatException){
@@ -131,16 +129,16 @@ public class App {
     }
 
     private void listRecipes(){
-        List<Recipe> recipeList = this.cookbookService.getRecipes();
+        List<RecipeDTO> recipeList = this.cookbookService.getRecipes();
         this.view.printRecipes(recipeList);
     }
 
     private void printRecipe(int number){
-        List<Recipe> recipeList = this.cookbookService.getRecipes();
+        List<RecipeDTO> recipeList = this.cookbookService.getRecipes();
         this.view.printRecipe(recipeList.get(number));
     }
 
-    private void processRecipeMenuInput(Recipe recipe, String index){
+    private void processRecipeMenuInput(RecipeDTO recipe, String index){
         switch (index){
             case "1":
                 this.view.printRecipeComments(recipe);
@@ -157,7 +155,7 @@ public class App {
         }
     }
 
-    private void newComment(Recipe recipe){
+    private void newComment(RecipeDTO recipe){
         this.view.printNewCommentForm();
         String commentDescription = this.view.getInput();
         this.cookbookService.saveComment(recipe, commentDescription);
@@ -166,7 +164,7 @@ public class App {
     private void newRecipe(){
 
         try {
-            Recipe recipe = this.view.printNewRecipeForm(EnumSet.allOf(Category.class), cookbookService.getCurrentUser());
+            RecipeDTO recipe = this.view.printNewRecipeForm(EnumSet.allOf(Category.class), cookbookService.getCurrentUser());
             this.cookbookService.addRecipe(recipe);
         }
         catch(NumberFormatException numberFormatException){

@@ -1,1 +1,0 @@
-# obudai-nagyv-21-tav-pirityi-istvan

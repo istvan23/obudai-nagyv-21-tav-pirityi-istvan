@@ -1,22 +1,22 @@
 package cookbook.view;
 
 import cookbook.domain.Category;
-import cookbook.domain.Cook;
-import cookbook.domain.Recipe;
+import cookbook.service.dto.CookDTO;
+import cookbook.service.dto.RecipeDTO;
 
 import java.util.List;
 import java.util.Set;
 
 public interface View {
-    Recipe printNewRecipeForm(Set<Category> categories, Cook uploader);
+    RecipeDTO printNewRecipeForm(Set<Category> categories, CookDTO uploader);
     void printWelcome();
     void printUserOptions();
     void printGuestOptions();
-    void printRecipe(Recipe recipe);
+    void printRecipe(RecipeDTO recipe);
     void printUserRecipeOptions();
     void printGuestRecipeOptions();
-    void printRecipeComments(Recipe recipe);
-    void printRecipes(List<Recipe> recipes);
+    void printRecipeComments(RecipeDTO recipe);
+    void printRecipes(List<RecipeDTO> recipes);
     void printNewCommentForm();
     void printNotAuthenticated();
     void printLogout();

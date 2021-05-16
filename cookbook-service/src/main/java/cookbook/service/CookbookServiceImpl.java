@@ -1,30 +1,57 @@
 package cookbook.service;
 
-import cookbook.domain.*;
-import cookbook.persistence.Data;
+import cookbook.domain.Category;
+import cookbook.persistence.entity.Comment;
+import cookbook.persistence.entity.Cook;
+import cookbook.persistence.entity.Ingredient;
+import cookbook.persistence.entity.Recipe;
+import cookbook.persistence.repository.CommentRepository;
+import cookbook.persistence.repository.CookRepository;
+import cookbook.persistence.repository.IngredientRepository;
+import cookbook.persistence.repository.RecipeRepository;
+import cookbook.service.dto.CookDTO;
+import cookbook.service.dto.RecipeDTO;
+import cookbook.service.transformer.CommentTransformer;
+import cookbook.service.transformer.CookTransformer;
+import cookbook.service.transformer.IngredientTransformer;
+import cookbook.service.transformer.RecipeTransformer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
+@Transactional
 public class CookbookServiceImpl implements CookbookService{
 
-    private Data data;
     private Cook user;
-    private CookBook cookBook;
 
     @Autowired
-    public CookbookServiceImpl(Data data){
-        this.data = data;
-        this.cookBook = new CookBook(data.getRecipes(), data.getCooks());
-    }
+    private CookRepository cookRepository;
+    @Autowired
+    private RecipeRepository recipeRepository;
+    @Autowired
+    private IngredientRepository ingredientRepository;
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private CookTransformer cookTransformer;
+    @Autowired
+    private RecipeTransformer recipeTransformer;
+    @Autowired
+    private IngredientTransformer ingredientTransformer;
+    @Autowired
+    private CommentTransformer commentTransformer;
 
     @Override
     public void login(String username) {
-        this.user = this.cookBook.getCooks().stream().filter(x -> x.getUsername().equals(username)).findFirst().get();
+        this.user = cookRepository.findByUsername(username).get();
     }
 
     @Override
@@ -33,17 +60,33 @@ public class CookbookServiceImpl implements CookbookService{
     }
 
     @Override
-    public void addRecipe(Recipe recipe) {
-        recipe.setId(this.data.generateId(Recipe.class));
-        this.cookBook.getRecipes().add(recipe);
-        this.user.getOwnRecipes().add(recipe);
+    public void addRecipe(RecipeDTO recipe) {
+        Recipe newRecipe = this.recipeTransformer.convertToEntity(recipe);
+        List<Ingredient> ingredients = new ArrayList<>();
+        recipe.getIngredients().forEach(ingredient -> ingredients.add(this.ingredientTransformer.convertToEntity(ingredient)));
+        newRecipe.setIngredients(ingredients);
+        newRecipe.setComments(new ArrayList<>());
+        newRecipe.setUploader(this.user);
+
+        this.user.getOwnRecipes().add(newRecipe);
+
+        this.recipeRepository.save(newRecipe);
     }
 
     @Override
-    public void saveComment(Recipe recipe, String comment) {
-        Comment newComment = new Comment(this.data.generateId(Comment.class), comment, LocalDateTime.now());
-        recipe.getComments().add(newComment);
+    public void saveComment(RecipeDTO recipe, String comment) {
+        Comment newComment = new Comment();
+        newComment.setDescription(comment);
+        newComment.setTimestamp(LocalDateTime.now());
+        Optional<Recipe> entity = this.recipeRepository.findById(recipe.getId());
+
+        commentRepository.save(newComment);
+
         this.user.getComments().add(newComment);
+
+        entity.get().getComments().add(newComment);
+
+        recipeRepository.save(entity.get());
     }
 
     @Override
@@ -52,8 +95,12 @@ public class CookbookServiceImpl implements CookbookService{
     }
 
     @Override
-    public List<Recipe> getRecipes() {
-        return this.cookBook.getRecipes();
+    public List<RecipeDTO> getRecipes() {
+        List<RecipeDTO> recipeList = new ArrayList<>();
+        this.recipeRepository.findAll().forEach(x -> {
+            recipeList.add(recipeTransformer.convertToDto(x));
+        });
+        return recipeList;
     }
 
     @Override
@@ -62,13 +109,13 @@ public class CookbookServiceImpl implements CookbookService{
     }
 
     @Override
-    public Cook getCurrentUser() {
-        return this.user;
+    public CookDTO getCurrentUser() {
+        return cookTransformer.convertToDto(this.user);
     }
 
     @Override
     public boolean authenticate(String username, String password) {
-        for(Cook cook : this.cookBook.getCooks()){
+        for(Cook cook : this.cookRepository.findAll()){
             if (cook.getUsername().equals(username) && cook.getPassword().equals(password)){
                 return true;
             }
@@ -79,20 +126,13 @@ public class CookbookServiceImpl implements CookbookService{
     @Override
     public void deleteRecipe(String recipe) {
         if (this.user != null){
-            Recipe deletable = this.cookBook.getRecipes().get(Integer.parseInt(recipe));
-            this.cookBook.getRecipes().remove(deletable);
-            this.cookBook.getCooks().forEach(cook -> {
-                if (cook.getOwnRecipes().contains(deletable)){
-                    cook.getOwnRecipes().remove(deletable);
-                }
-                if (!cook.getComments().isEmpty()){
-                    deletable.getComments().forEach( comment -> {
-                        if (cook.getComments().contains(comment)){
-                            cook.getComments().remove(comment);
-                        }
-                    });
-                }
-            });
+            try {
+                Recipe deletable = this.recipeRepository.findById(Long.parseLong(recipe)).get();
+                this.recipeRepository.delete(deletable);
+            }
+            catch (Exception e){
+                System.out.println("Wrong recipe id. (Warning: Recipe ID is not equal with the number on the list) ");
+            }
         }
     }
 }

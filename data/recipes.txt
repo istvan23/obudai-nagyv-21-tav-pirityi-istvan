@@ -21,3 +21,18 @@ Heat the oil in a saucepan over a medium heat. Add the onion and garlic and fry 
 [categories]
 SOUP
 SALTY
+[id]
+3
+[user_id]
+1
+[name]
+Lecsóstészta
+[ingredients]
+2.0 KILOGRAM tészta
+4.0 KILOGRAM lecsó
+[preparation]
+Összeöntöm és kész
+[servings]
+10
+[categories]
+MAIN_COURSE

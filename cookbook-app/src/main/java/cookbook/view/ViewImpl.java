@@ -1,17 +1,18 @@
 package cookbook.view;
 
-import cookbook.builders.RecipeBuilder;
-import cookbook.domain.*;
+import cookbook.domain.Category;
+import cookbook.domain.Unit;
+import cookbook.service.dto.CookDTO;
+import cookbook.service.dto.IngredientDTO;
+import cookbook.service.dto.RecipeDTO;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 import java.util.*;
 
 @Component
 public class ViewImpl implements View{
     private static Scanner scanner = new Scanner(System.in);
     @Override
-    public Recipe printNewRecipeForm(Set<Category> categories, Cook uploader) {
+    public RecipeDTO printNewRecipeForm(Set<Category> categories, CookDTO uploader) {
         System.out.println("What's the name of your dish?");
         String name = scanner.nextLine();
         while(name.isEmpty()){
@@ -22,14 +23,19 @@ public class ViewImpl implements View{
         System.out.println("How many people does this dish serve?");
         Integer serve = Integer.parseInt(scanner.nextLine());
         System.out.println("What kind of ingredients do you need?");
-        List<Ingredient> ingredients = new ArrayList<>();
+        List<IngredientDTO> ingredients = new ArrayList<>();
         boolean moreIngredient = false;
         do {
             try {
                 int amount = Integer.parseInt(scanner.nextLine());
                 Unit unit = Unit.valueOf(scanner.nextLine().toUpperCase());
                 String ingredientName = scanner.nextLine();
-                Ingredient ingredient = new Ingredient(amount, ingredientName, unit);
+
+                IngredientDTO ingredient = new IngredientDTO();
+                ingredient.setAmount(amount);
+                ingredient.setName(ingredientName);
+                ingredient.setUnit(unit);
+
                 ingredients.add(ingredient);
                 System.out.println("Add another? (Y/N)");
                 char repeat;
@@ -68,16 +74,14 @@ public class ViewImpl implements View{
                 System.out.println("Wrong input, please try again!");
             }
         }while(!input.equals("C") && !categories.isEmpty());
-        RecipeBuilder recipeBuilder = new RecipeBuilder();
-        Recipe newRecipe = recipeBuilder
-                .setName(name)
-                .setPreparation(preparation)
-                .setServings(serve)
-                .setCategories(List.copyOf(recipeCategories))
-                .setIngredients(ingredients)
-                .setUploader(uploader)
-                .setComments(new ArrayList<>())
-                .getRecipe();
+        RecipeDTO newRecipe = new RecipeDTO();
+        newRecipe.setName(name);
+        newRecipe.setPreparation(preparation);
+        newRecipe.setServings(serve);
+        newRecipe.setCategories(recipeCategories);
+        newRecipe.setIngredients(ingredients);
+        newRecipe.setUploader(uploader);
+        newRecipe.setComments(new ArrayList<>());
 
         return newRecipe;
     }
@@ -104,13 +108,13 @@ public class ViewImpl implements View{
     }
 
     @Override
-    public void printRecipe(Recipe recipe) {
+    public void printRecipe(RecipeDTO recipe) {
         System.out.println("\t\t -- Recipe: "+recipe.getName()+" --");
         System.out.println("Recipe ID:\t"+recipe.getId());
         System.out.println("Uploader:\t"+recipe.getUploader().getUsername());
         System.out.println("Servings:\t"+recipe.getServings());
         System.out.println("Ingredients:");
-        for(Ingredient ingredient : recipe.getIngredients()){
+        for(IngredientDTO ingredient : recipe.getIngredients()){
             System.out.println("\t"+ingredient.getAmount()+" "+ingredient.getUnit()+" "+ingredient.getName());
         }
         System.out.println("Preparation:\n\t"+recipe.getPreparation());
@@ -135,7 +139,7 @@ public class ViewImpl implements View{
     }
 
     @Override
-    public void printRecipeComments(Recipe recipe) {
+    public void printRecipeComments(RecipeDTO recipe) {
         for(int i = 0; i < recipe.getComments().size(); i++){
             System.out.println(i+".\t"+recipe.getComments().get(i).getTimestamp());
             System.out.println(recipe.getComments().get(i).getDescription());
@@ -143,7 +147,7 @@ public class ViewImpl implements View{
     }
 
     @Override
-    public void printRecipes(List<Recipe> recipes) {
+    public void printRecipes(List<RecipeDTO> recipes) {
         for(int i = 0; i < recipes.size(); i++){
             System.out.println(i+": "+recipes.get(i).getName());
         }
